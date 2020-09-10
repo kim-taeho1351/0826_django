@@ -1,4 +1,8 @@
 {% extends 'base.html' %}
+<!-- 외부에서 socialaccount 기능을 가져와 사용함을 알림 -->
+{% load socialaccount %}
+<!-- 로그인 페이지의 기본적 템플릿 등을 가져와 사용함을 알림 -->
+{% providers_media_js %}
 
 {% block content %}
     <main role="main">
@@ -15,6 +19,22 @@
                 </p>
             </div>
         </section>
+
+        <!-- 소셜 로그인 -->
+        <a href="/accounts/signup">회원가입</a><br>
+        <!-- 직접 구현하지 않아도 페키지에서 url을 만들고 연결해줌 -->
+
+        {% if user.is_authenticated %} <!-- 로그인된 상태일때 로그아웃 기능, 현재상태 제공 -->
+        <a href="/accounts/logout">로그아웃</a><br>
+        {{user.username}} 님이 로그인 중
+
+        {% else %}
+        <a href="/accounts/login">Login</a> <!-- 로그인 상태가 아니라면 로그인 기능 제공 -->
+        <a href="{% provider_login_url 'google' %}">Login with google</a><br>
+        <!-- 구글 로그인 사용할 것이라고 알림 -->
+
+
+        {% endif %}
 
         <div class="album py-5 bg-light">
             <div class="container">

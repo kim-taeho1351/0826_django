@@ -2,82 +2,111 @@
 
 
 {% block content %}
-  <!-- Page Content -->
-  <div class="container">
+<!-- Page Content -->
+<div class="container">
 
-    <div class="row">
+  <div class="row">
 
-      <!-- Post Content Column -->
-      <div class="col-lg-8">
+    <!-- Post Content Column -->
+    <div class="col-lg-8">
 
-        <!-- Title -->
-        <h1 class="mt-4">{{ post.title }}</h1>
+      <!-- Title -->
+      <h1 class="mt-4">{{ post.title }}</h1>
 
-        <!-- Author -->
-        <p class="lead">
-          by
-          <a href="#">Kimtaeho</a>
-        </p>
+      <!-- Author -->
+      <p class="lead">
+        by
+        <a href="#">Kimtaeho</a>
+      </p>
 
-        <hr>
+      <hr>
 
-        <!-- Date/Time -->
-        <p>{{ post.pub_date }}</p>
+      <!-- Date/Time -->
+      <p>{{ post.pub_date }}</p>
 
-        <hr>
+      <hr>
 
-        <!-- Preview Image -->
-        {% if post.image != '' %}
-        <img src="{{ post.image.url }}" height= "500" alt=" Card image cap">    
+      <!-- Preview Image -->
+      {% if post.image != '' %}
+      <img src="{{ post.image.url }}" height="500" alt=" Card image cap">
 
-        {% else %}
-        <svg width="100%" height="500" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice" focusable="false" role="img" aria-label="Placeholder: Thumbnail"><rect width="100%" height="100%" fill="#55595c"/><text x="50%" y="50%" fill="#eceeef" dy=".3em">No image</text></svg>
-                    
-        {% endif %}
+      {% else %}
+      <svg width="100%" height="500" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice"
+        focusable="false" role="img" aria-label="Placeholder: Thumbnail">
+        <rect width="100%" height="100%" fill="#55595c" /><text x="50%" y="50%" fill="#eceeef" dy=".3em">No
+          image</text></svg>
 
-        <hr>
+      {% endif %}
 
-        <!-- Post Content -->
-        <p class="lead">{{post.body}}</p>
+      <hr>
 
-        <hr>
+      <!-- Post Content -->
+      <p class="lead">{{post.body}}</p>
 
-        <!--edit,delete button-->
-        <div align="right">
-            <a href="{% url 'edit' post.id %}" class="btn btn-primary my-2">Edit</a>
-            <a href="{%url 'delete' post.id %}" class="btn btn-primary my-2">Delete</a>
+      <hr>
+
+      <!--edit,delete button-->
+      <div align="right">
+        <a href="{% url 'edit' post.id %}" class="btn btn-primary my-2">Edit</a>
+        <a href="{%url 'delete' post.id %}" class="btn btn-primary my-2">Delete</a>
+      </div>
+
+      <!-- Like-->
+      <div class="card my-4">
+        <div class="card-header">
+          {% if user.is_authenticated %}
+
+          <!-- 좋야요가 눌러진 상태 -->
+          {% if user in post.like_users.all %}
+          <a href="{% url 'like' post.id %}"><i class="fas fa-heart"></i></a>
+          <!-- 좋아요가 눌러지지 않은 상태 -->
+          {% else %}
+          <a href="{% url 'like' post.id %}"><i class="far fa-heart"></i></a>
+          {% endif %}
+          <!--like user count-->
+          {{ post.like_users.count }}명이 좋아합니다.<br><br>
+
+          <!-- 로그인하지 않은 상태 -->
+          {% else %}
+          <i class="far fa-heart"></i> {{ post.like_users.count }}명이 좋아합니다.
+          <br>좋아요를 누르려면 로그인이 필요합니다.
+
+          {% endif %}
+
+          {% for likeuser in post.like_users.all %}
+          {{likeuser.username}}
+          {% endfor %}
         </div>
+      </div>
 
-        <hr>
+      <!-- Comments Form -->
+      <div class="card my-4">
+        <h5 class="card-header">Leave a Comment:</h5>
+        <div class="card-body">
+          <form action="{% url 'comments_create' post.pk %}" method="POST">
+            {% csrf_token %}
+            <div class="form-group">
+              <textarea class="form-control" rows="3" name="content"></textarea>
+            </div>
+            <button type="submit" class="btn btn-primary">Submit</button>
+          </form>
+        </div>
+      </div>
 
-        <!-- Comments Form -->
-        <div class="card my-4">
-          <h5 class="card-header">Leave a Comment:</h5>
-          <div class="card-body">
-            <form action="{% url 'comments_create' post.pk %}" method="POST">
-                {% csrf_token %}
-                <div class="form-group">
-                    <textarea class="form-control" rows="3" name="content"></textarea>
-                </div>
-                <button type="submit" class="btn btn-primary">Submit</button>
-            </form>
+      <!-- Single Comment -->
+      {% for comment in post.comment_set.all %}
+      <div class="media mb-4">
+        <img class="d-flex mr-3 rounded-circle" src="http://placehold.it/50x50" alt="">
+        <div class="media-body">
+          <h5 class="mt-0">anonymous</h5>
+          {{ comment }}
+          <div align="right">
+            <a href="{%url 'comments_update' post.id comment.id %}" class="btn btn-primary my-2">Edit</a>
+            <a href="{%url 'comments_delete' post.id comment.id %}" class="btn btn-primary my-2">Delete</a>
           </div>
         </div>
-
-        <!-- Single Comment -->
-        {% for comment in post.comment_set.all %}
-            <div class="media mb-4">
-                <img class="d-flex mr-3 rounded-circle" src="http://placehold.it/50x50" alt="">
-                <div class="media-body">
-                    <h5 class="mt-0">anonymous</h5>
-                    {{ comment }}
-                    <div align="right">
-                        <a href="{%url 'comments_update' post.id comment.id %}" class="btn btn-primary my-2">Edit</a>
-                        <a href="{%url 'comments_delete' post.id comment.id %}" class="btn btn-primary my-2">Delete</a>
-                    </div>
-                </div>
-            </div>
-        {% endfor %}
+      </div>
+      {% endfor %}
 
       <!-- Sidebar Widgets Column -->
       <div class="col-md-4">
@@ -134,7 +163,8 @@
         <div class="card my-4">
           <h5 class="card-header">Widget</h5>
           <div class="card-body">
-            You can put anything you want inside of these side widgets. They are easy to use, and feature the new Bootstrap 4 card containers!
+            You can put anything you want inside of these side widgets. They are easy to use, and feature the new
+            Bootstrap 4 card containers!
           </div>
         </div>
 

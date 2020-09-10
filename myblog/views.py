@@ -80,3 +80,15 @@ def comments_update(request, post_id, comment_id):
     
     else:
         return render(request, 'comments_update.html', {'post':post, 'comment':comment})
+    
+
+def like(request, post_id):
+    post = get_object_or_404(Post, pk=post_id)
+
+    if request.user in post.like_users.all():
+        #인스턴스 객체 post내 like_users안의 모든 유저정보 가지고 옴
+        post.like_users.remove(request.user)
+    else:
+        post.like_users.add(request.user)
+
+    return redirect('/' + str(post.id))
